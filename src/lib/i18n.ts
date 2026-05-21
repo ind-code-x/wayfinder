@@ -1,0 +1,198 @@
+export type LanguageCode = 'en' | 'hi' | 'te' | 'ta' | 'kn' | 'bn' | 'mr' | 'ml' | 'gu' | 'pa';
+
+export const LANGUAGES: { code: LanguageCode; label: string; nativeName: string }[] = [
+  { code: 'en', label: 'EN', nativeName: 'English' },
+  { code: 'hi', label: 'HI', nativeName: 'हिन्दी' },
+  { code: 'te', label: 'TE', nativeName: 'తెలుగు' },
+  { code: 'ta', label: 'TA', nativeName: 'தமிழ்' },
+  { code: 'kn', label: 'KN', nativeName: 'ಕನ್ನಡ' },
+  { code: 'bn', label: 'BN', nativeName: 'বাংলা' },
+  { code: 'mr', label: 'MR', nativeName: 'मराठी' },
+  { code: 'ml', label: 'ML', nativeName: 'മലയാളം' },
+  { code: 'gu', label: 'GU', nativeName: 'ગુજરાતી' },
+  { code: 'pa', label: 'PA', nativeName: 'ਪੰਜਾਬੀ' },
+];
+
+type Copy = {
+  explore: string;
+  blog: string;
+  about: string;
+  getFromAnywhere: string;
+  toEverywhere: string;
+  heroSubtitle: string;
+  routeCount: string;
+  fromPlaceholder: string;
+  toPlaceholder: string;
+  search: string;
+  popularRoutes: string;
+  autoUpdated: string;
+  howItWorks: string;
+  howItWorksSubtitle: string;
+};
+
+export const COPY: Record<LanguageCode, Copy> = {
+  en: {
+    explore: 'Explore',
+    blog: 'Blog',
+    about: 'About',
+    getFromAnywhere: 'Get from anywhere',
+    toEverywhere: 'to everywhere',
+    heroSubtitle: 'Compare flights, trains, buses, ferries and more — all in one search.',
+    routeCount: 'Searching 5,000+ routes across 100+ countries',
+    fromPlaceholder: 'From where?',
+    toPlaceholder: 'To where?',
+    search: 'Search',
+    popularRoutes: 'Popular Routes from India',
+    autoUpdated: 'Auto updated',
+    howItWorks: 'How it works',
+    howItWorksSubtitle: 'Plan your perfect journey in seconds with Wayfinder.',
+  },
+  hi: {
+    explore: 'एक्सप्लोर',
+    blog: 'ब्लॉग',
+    about: 'हमारे बारे में',
+    getFromAnywhere: 'कहीं से भी जाएं',
+    toEverywhere: 'हर जगह तक',
+    heroSubtitle: 'फ्लाइट, ट्रेन, बस, फेरी और अधिक विकल्प एक ही खोज में तुलना करें।',
+    routeCount: '100+ देशों में 5,000+ मार्ग खोजें',
+    fromPlaceholder: 'कहां से?',
+    toPlaceholder: 'कहां तक?',
+    search: 'खोजें',
+    popularRoutes: 'भारत के लोकप्रिय मार्ग',
+    autoUpdated: 'स्वतः अपडेट',
+    howItWorks: 'यह कैसे काम करता है',
+    howItWorksSubtitle: 'Wayfinder के साथ कुछ सेकंड में अपनी यात्रा की योजना बनाएं।',
+  },
+  te: {
+    explore: 'అన్వేషించండి',
+    blog: 'బ్లాగ్',
+    about: 'గురించి',
+    getFromAnywhere: 'ఎక్కడి నుంచైనా వెళ్లండి',
+    toEverywhere: 'ఎక్కడికైనా',
+    heroSubtitle: 'విమానాలు, రైళ్లు, బస్సులు, ఫెర్రీలు మరిన్ని ఒకే శోధనలో పోల్చండి.',
+    routeCount: '100+ దేశాల్లో 5,000+ మార్గాలు శోధించండి',
+    fromPlaceholder: 'ఎక్కడి నుంచి?',
+    toPlaceholder: 'ఎక్కడికి?',
+    search: 'శోధించండి',
+    popularRoutes: 'భారతదేశంలో ప్రసిద్ధ మార్గాలు',
+    autoUpdated: 'ఆటో అప్డేట్',
+    howItWorks: 'ఇది ఎలా పని చేస్తుంది',
+    howItWorksSubtitle: 'Wayfinder తో కొన్ని సెకన్లలో మీ ప్రయాణాన్ని ప్లాన్ చేయండి.',
+  },
+  ta: {
+    explore: 'ஆராயுங்கள்',
+    blog: 'வலைப்பதிவு',
+    about: 'பற்றி',
+    getFromAnywhere: 'எங்கிருந்தும் செல்லுங்கள்',
+    toEverywhere: 'எங்கும்',
+    heroSubtitle: 'விமானம், ரயில், பேருந்து, படகு மற்றும் பலவற்றை ஒரே தேடலில் ஒப்பிடுங்கள்.',
+    routeCount: '100+ நாடுகளில் 5,000+ வழிகளை தேடுங்கள்',
+    fromPlaceholder: 'எங்கிருந்து?',
+    toPlaceholder: 'எங்கே?',
+    search: 'தேடு',
+    popularRoutes: 'இந்தியாவின் பிரபலமான வழிகள்',
+    autoUpdated: 'தானாக புதுப்பிக்கும்',
+    howItWorks: 'இது எப்படி வேலை செய்கிறது',
+    howItWorksSubtitle: 'Wayfinder மூலம் சில விநாடிகளில் உங்கள் பயணத்தை திட்டமிடுங்கள்.',
+  },
+  kn: {
+    explore: 'ಅನ್ವೇಷಿಸಿ',
+    blog: 'ಬ್ಲಾಗ್',
+    about: 'ಬಗ್ಗೆ',
+    getFromAnywhere: 'ಎಲ್ಲಿಂದ ಬೇಕಾದರೂ ಹೋಗಿ',
+    toEverywhere: 'ಎಲ್ಲೆಡೆಗೆ',
+    heroSubtitle: 'ವಿಮಾನ, ರೈಲು, ಬಸ್, ಫೆರಿ ಮತ್ತು ಇನ್ನಷ್ಟು ಆಯ್ಕೆಗಳನ್ನು ಒಂದೇ ಹುಡುಕಾಟದಲ್ಲಿ ಹೋಲಿಸಿ.',
+    routeCount: '100+ ದೇಶಗಳಲ್ಲಿ 5,000+ ಮಾರ್ಗಗಳನ್ನು ಹುಡುಕಿ',
+    fromPlaceholder: 'ಎಲ್ಲಿಂದ?',
+    toPlaceholder: 'ಎಲ್ಲಿ?',
+    search: 'ಹುಡುಕಿ',
+    popularRoutes: 'ಭಾರತದ ಜನಪ್ರಿಯ ಮಾರ್ಗಗಳು',
+    autoUpdated: 'ಸ್ವಯಂ ನವೀಕರಣ',
+    howItWorks: 'ಇದು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ',
+    howItWorksSubtitle: 'Wayfinder ಜೊತೆ ಕೆಲವು ಸೆಕೆಂಡುಗಳಲ್ಲಿ ನಿಮ್ಮ ಪ್ರಯಾಣವನ್ನು ಯೋಜಿಸಿ.',
+  },
+  bn: {
+    explore: 'এক্সপ্লোর',
+    blog: 'ব্লগ',
+    about: 'সম্পর্কে',
+    getFromAnywhere: 'যেকোনো জায়গা থেকে যান',
+    toEverywhere: 'সব জায়গায়',
+    heroSubtitle: 'ফ্লাইট, ট্রেন, বাস, ফেরি এবং আরও বিকল্প এক সার্চে তুলনা করুন।',
+    routeCount: '100+ দেশে 5,000+ রুট খুঁজুন',
+    fromPlaceholder: 'কোথা থেকে?',
+    toPlaceholder: 'কোথায়?',
+    search: 'খুঁজুন',
+    popularRoutes: 'ভারতের জনপ্রিয় রুট',
+    autoUpdated: 'স্বয়ংক্রিয় আপডেট',
+    howItWorks: 'এটি কীভাবে কাজ করে',
+    howItWorksSubtitle: 'Wayfinder দিয়ে কয়েক সেকেন্ডে আপনার ভ্রমণ পরিকল্পনা করুন।',
+  },
+  mr: {
+    explore: 'एक्सप्लोर',
+    blog: 'ब्लॉग',
+    about: 'आमच्याबद्दल',
+    getFromAnywhere: 'कुठूनही जा',
+    toEverywhere: 'सर्वत्र',
+    heroSubtitle: 'फ्लाइट, ट्रेन, बस, फेरी आणि अधिक पर्याय एका शोधात तुलना करा.',
+    routeCount: '100+ देशांतील 5,000+ मार्ग शोधा',
+    fromPlaceholder: 'कुठून?',
+    toPlaceholder: 'कुठे?',
+    search: 'शोधा',
+    popularRoutes: 'भारतातील लोकप्रिय मार्ग',
+    autoUpdated: 'स्वयंचलित अपडेट',
+    howItWorks: 'हे कसे काम करते',
+    howItWorksSubtitle: 'Wayfinder सोबत काही सेकंदांत तुमची यात्रा नियोजित करा.',
+  },
+  ml: {
+    explore: 'അന്വേഷിക്കുക',
+    blog: 'ബ്ലോഗ്',
+    about: 'ഞങ്ങളെക്കുറിച്ച്',
+    getFromAnywhere: 'എവിടെ നിന്നുമാകാം',
+    toEverywhere: 'എവിടേക്കും',
+    heroSubtitle: 'വിമാനങ്ങൾ, ട്രെയിനുകൾ, ബസുകൾ, ഫെറികൾ എന്നിവ ഒറ്റ തിരച്ചിലിൽ താരതമ്യം ചെയ്യുക.',
+    routeCount: '100+ രാജ്യങ്ങളിലെ 5,000+ റൂട്ടുകൾ തിരയുക',
+    fromPlaceholder: 'എവിടെ നിന്ന്?',
+    toPlaceholder: 'എവിടേക്ക്?',
+    search: 'തിരയുക',
+    popularRoutes: 'ഇന്ത്യയിലെ ജനപ്രിയ റൂട്ടുകൾ',
+    autoUpdated: 'ഓട്ടോ അപ്ഡേറ്റ്',
+    howItWorks: 'ഇത് എങ്ങനെ പ്രവർത്തിക്കുന്നു',
+    howItWorksSubtitle: 'Wayfinder ഉപയോഗിച്ച് സെക്കൻഡുകൾക്കുള്ളിൽ യാത്ര പ്ലാൻ ചെയ്യൂ.',
+  },
+  gu: {
+    explore: 'એક્સપ્લોર',
+    blog: 'બ્લોગ',
+    about: 'વિશે',
+    getFromAnywhere: 'ક્યાંયથી પણ જાઓ',
+    toEverywhere: 'દરેક જગ્યાએ',
+    heroSubtitle: 'ફ્લાઇટ, ટ્રેન, બસ, ફેરી અને વધુ વિકલ્પો એક જ શોધમાં સરખાવો.',
+    routeCount: '100+ દેશોમાં 5,000+ રૂટ શોધો',
+    fromPlaceholder: 'ક્યાંથી?',
+    toPlaceholder: 'ક્યાં?',
+    search: 'શોધો',
+    popularRoutes: 'ભારતના લોકપ્રિય રૂટ',
+    autoUpdated: 'ઓટો અપડેટ',
+    howItWorks: 'આ કેવી રીતે કાર્ય કરે છે',
+    howItWorksSubtitle: 'Wayfinder સાથે સેકન્ડોમાં તમારી મુસાફરી પ્લાન કરો.',
+  },
+  pa: {
+    explore: 'ਐਕਸਪਲੋਰ',
+    blog: 'ਬਲਾਗ',
+    about: 'ਬਾਰੇ',
+    getFromAnywhere: 'ਕਿਤੇ ਤੋਂ ਵੀ ਜਾਓ',
+    toEverywhere: 'ਹਰ ਜਗ੍ਹਾ',
+    heroSubtitle: 'ਫਲਾਈਟਾਂ, ਰੇਲਾਂ, ਬੱਸਾਂ, ਫੈਰੀਆਂ ਅਤੇ ਹੋਰ ਚੋਣਾਂ ਇੱਕ ਖੋਜ ਵਿੱਚ ਮਿਲਾਓ।',
+    routeCount: '100+ ਦੇਸ਼ਾਂ ਵਿੱਚ 5,000+ ਰੂਟ ਖੋਜੋ',
+    fromPlaceholder: 'ਕਿੱਥੋਂ?',
+    toPlaceholder: 'ਕਿੱਥੇ?',
+    search: 'ਖੋਜੋ',
+    popularRoutes: 'ਭਾਰਤ ਦੇ ਲੋਕਪ੍ਰਿਯ ਰੂਟ',
+    autoUpdated: 'ਆਟੋ ਅਪਡੇਟ',
+    howItWorks: 'ਇਹ ਕਿਵੇਂ ਕੰਮ ਕਰਦਾ ਹੈ',
+    howItWorksSubtitle: 'Wayfinder ਨਾਲ ਕੁਝ ਸਕਿੰਟਾਂ ਵਿੱਚ ਆਪਣੀ ਯਾਤਰਾ ਪਲਾਨ ਕਰੋ।',
+  },
+};
+
+export function getCopy(language: LanguageCode): Copy {
+  return COPY[language] ?? COPY.en;
+}

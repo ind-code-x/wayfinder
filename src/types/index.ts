@@ -22,6 +22,18 @@ export interface RouteOption {
   travelDate?: string;
   fareNotes?: string[];
   fareBreakdown?: { label: string; value: string }[];
+  fareProviders?: {
+    operator: string;
+    title: string;
+    link?: string;
+    snippet?: string;
+    price?: number;
+  }[];
+  bookingLinks?: {
+    label: string;
+    provider: string;
+    url: string;
+  }[];
 }
 
 export interface SearchQuery {

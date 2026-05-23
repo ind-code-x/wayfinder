@@ -25,6 +25,53 @@ const SELF_DRIVE_MILEAGE_KM_PER_LITRE = 15;
 const CAB_BASE_FARE_INR = 120;
 const CAB_RATE_INR_PER_KM = 18;
 
+function searchUrl(base: string, query: string): string {
+  return `${base}${encodeURIComponent(query)}`;
+}
+
+function buildBookingLinks(mode: TransportMode, from: string, to: string, travelDate?: string): NonNullable<RouteOption['bookingLinks']> {
+  const dateText = travelDate ? ` ${travelDate}` : '';
+  const routeText = `${from} to ${to}${dateText}`;
+
+  if (mode === 'fly') {
+    return [
+      { label: 'Compare flights', provider: 'Google Flights search', url: searchUrl('https://www.google.com/search?q=', `${routeText} flights`) },
+      { label: 'Check airline fares', provider: 'MakeMyTrip', url: searchUrl('https://www.makemytrip.com/flights/?s=', `${routeText} flights`) },
+      { label: 'Compare flight deals', provider: 'Skyscanner', url: searchUrl('https://www.skyscanner.co.in/transport/flights/search?q=', `${routeText} flights`) },
+      { label: 'Search flight offers', provider: 'Goibibo', url: searchUrl('https://www.goibibo.com/flights/?s=', `${routeText} flights`) },
+    ];
+  }
+
+  if (mode === 'bus') {
+    return [
+      { label: 'Compare bus tickets', provider: 'redBus', url: searchUrl('https://www.redbus.in/search?search=', `${routeText} bus`) },
+      { label: 'Check bus fares', provider: 'AbhiBus', url: searchUrl('https://www.abhibus.com/search?search=', `${routeText} bus`) },
+      { label: 'Search bus options', provider: 'MakeMyTrip Bus', url: searchUrl('https://www.makemytrip.com/bus-tickets/search?search=', `${routeText} bus`) },
+      { label: 'Compare coach fares', provider: 'Google search', url: searchUrl('https://www.google.com/search?q=', `${routeText} bus ticket fare`) },
+    ];
+  }
+
+  if (mode === 'train') {
+    return [
+      { label: 'Check train tickets', provider: 'IRCTC', url: 'https://www.irctc.co.in/nget/train-search' },
+      { label: 'Search train schedules', provider: 'Google search', url: searchUrl('https://www.google.com/search?q=', `${routeText} train ticket fare IRCTC`) },
+      { label: 'Check train options', provider: 'ConfirmTkt', url: searchUrl('https://www.confirmtkt.com/rbooking-d/trains/from/', routeText) },
+    ];
+  }
+
+  if (mode === 'drive') {
+    return [
+      { label: 'Open road route', provider: 'Google Maps', url: `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}&travelmode=driving` },
+      { label: 'Compare cab fares', provider: 'Google search', url: searchUrl('https://www.google.com/search?q=', `${routeText} cab fare`) },
+      { label: 'Search car rentals', provider: 'Google search', url: searchUrl('https://www.google.com/search?q=', `${routeText} self drive car rental`) },
+    ];
+  }
+
+  return [
+    { label: 'Search booking options', provider: 'Google search', url: searchUrl('https://www.google.com/search?q=', `${routeText} travel ticket fare`) },
+  ];
+}
+
 function formatDuration(minutes: number): string {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
@@ -208,9 +255,10 @@ function createRoute(
     travelDate,
     fareNotes: driveCosts?.notes ?? [
       'Estimated fare changes by travel date, weekend demand, and peak season.',
-      'Connect provider APIs for live cheapest ticket prices.',
+      'Use the booking links below to compare live prices before payment.',
     ],
     fareBreakdown: driveCosts?.breakdown,
+    bookingLinks: buildBookingLinks(mode, origin.name, destination.name, travelDate),
   };
 }
 
@@ -266,8 +314,9 @@ function buildInternationalFlightOptions(origin: Place, destination: Place, trav
       travelDate,
       fareNotes: [
         'Estimated flight range adjusts for travel date, weekend demand, and peak season.',
-        'Connect Amadeus, Duffel, Skyscanner, or airline APIs for live cheapest fares.',
+        'Use the booking links below to compare live prices before payment.',
       ],
+      bookingLinks: buildBookingLinks('fly', origin.name, airport.city, travelDate),
     } satisfies RouteOption;
   });
 }
@@ -305,20 +354,28 @@ export async function findRoutes(from: string, to: string, travelDate?: string):
     const [origin, destination] = await Promise.all([geocode(from), geocode(to)]);
     const international = origin.country && destination.country && origin.country !== destination.country;
     const veryLongDistance = haversineKm(origin, destination) > 2500;
+    let routeOptions: RouteOption[];
 
     if (international || veryLongDistance || destination.placeType === 'country') {
       return buildInternationalFlightOptions(origin, destination, travelDate);
     }
 
     const roadRoute = await getDrivingRoute(origin, destination);
-    return buildLiveOptions(roadRoute, origin, destination, travelDate);
+    routeOptions = buildLiveOptions(roadRoute, origin, destination, travelDate);
+    return routeOptions;
   } catch (error) {
     console.warn('Live route lookup failed. Falling back to estimated routes.', error);
-    return generateRoutes(from, to).map(route => ({
+    const fallbackRoutes: RouteOption[] = generateRoutes(from, to).map(route => ({
       ...route,
-      source: 'estimated',
+      source: 'estimated' as const,
       updatedAt: new Date().toISOString(),
       travelDate,
+      bookingLinks: buildBookingLinks(route.mode, from, to, travelDate),
+      fareNotes: [
+        ...(route.fareNotes ?? []),
+        'Use the booking links below to compare live prices before payment.',
+      ],
     }));
+    return fallbackRoutes;
   }
 }

@@ -154,7 +154,7 @@ export default function RouteMap({ route, from, to }: RouteMapProps) {
           </div>
         </div>
 
-        {(route.fareBreakdown?.length || route.fareNotes?.length) && (
+        {(route.fareBreakdown?.length || route.fareProviders?.length || route.bookingLinks?.length || route.fareNotes?.length) && (
           <div className="mt-5">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">Fare details</h3>
             {route.fareBreakdown && route.fareBreakdown.length > 0 && (
@@ -168,13 +168,79 @@ export default function RouteMap({ route, from, to }: RouteMapProps) {
               </div>
             )}
             {route.fareNotes && route.fareNotes.length > 0 && (
-              <ul className="space-y-1.5">
+              <ul className="mb-3 space-y-1.5">
                 {route.fareNotes.map(note => (
                   <li key={note} className="text-xs text-gray-500 leading-relaxed">
                     {note}
                   </li>
                 ))}
               </ul>
+            )}
+            {route.bookingLinks && route.bookingLinks.length > 0 && (
+              <div className="mb-3">
+                <div className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">
+                  Compare live fares
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  {route.bookingLinks.map(link => (
+                    <a
+                      key={`${link.provider}-${link.label}`}
+                      href={link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-700 hover:border-orange-200 hover:bg-orange-50"
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate">{link.label}</span>
+                        <span className="block text-xs font-normal text-gray-400">{link.provider}</span>
+                      </span>
+                      <ExternalLink size={14} className="shrink-0 text-orange-600" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+            {route.fareProviders && route.fareProviders.length > 0 && (
+              <div className="mb-3 space-y-2">
+                <div className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                  Top cheapest operators from Google
+                </div>
+                {route.fareProviders.map((provider, index) => (
+                  <div key={`${provider.operator}-${index}`} className="rounded-xl border border-gray-100 bg-gray-50 p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-sm font-bold text-gray-800 truncate">
+                          {index + 1}. {provider.operator}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                          {provider.title}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <div className="text-sm font-bold text-green-700">
+                          {provider.price ? formatCurrency(provider.price, route.currency) : 'Check fare'}
+                        </div>
+                        {provider.link && (
+                          <a
+                            href={provider.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-orange-600 hover:text-orange-700"
+                          >
+                            Open
+                            <ExternalLink size={11} />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                    {provider.snippet && (
+                      <p className="text-xs text-gray-400 mt-2 line-clamp-2">
+                        {provider.snippet}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         )}

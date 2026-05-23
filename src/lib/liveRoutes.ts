@@ -94,6 +94,20 @@ function cityName(place: Place): string {
   return [place.name, place.country].filter(Boolean).join(', ');
 }
 
+function placeFromQuery(query: string): Place {
+  const parts = query.split(',').map(part => part.trim()).filter(Boolean);
+  const name = parts[0] || query;
+  const country = parts.find(part => part.toLowerCase() === 'india') ?? parts[parts.length - 1];
+
+  return {
+    name,
+    country,
+    displayName: query,
+    lat: 0,
+    lon: 0,
+  };
+}
+
 function airportFor(place: Place): { name: string; area: string; code?: string } {
   const display = `${place.name} ${place.displayName}`.toLowerCase();
   if (display.includes('hyderabad')) return { name: 'Rajiv Gandhi International Airport', area: 'Shamshabad', code: 'HYD' };
@@ -104,6 +118,19 @@ function airportFor(place: Place): { name: string; area: string; code?: string }
   if (display.includes('chennai')) return { name: 'Chennai International Airport', area: 'Meenambakkam', code: 'MAA' };
   if (display.includes('kolkata')) return { name: 'Netaji Subhas Chandra Bose International Airport', area: 'Dum Dum', code: 'CCU' };
   return { name: `${place.name} Airport`, area: place.name };
+}
+
+function railwayStationFor(place: Place): { name: string; area: string; code?: string } {
+  const display = `${place.name} ${place.displayName}`.toLowerCase();
+  if (display.includes('hyderabad')) return { name: 'Hyderabad Deccan Nampally', area: 'Hyderabad', code: 'HYB' };
+  if (display.includes('secunderabad')) return { name: 'Secunderabad Junction', area: 'Secunderabad', code: 'SC' };
+  if (display.includes('pune')) return { name: 'Pune Junction', area: 'Pune', code: 'PUNE' };
+  if (display.includes('mumbai')) return { name: 'Chhatrapati Shivaji Maharaj Terminus', area: 'Mumbai', code: 'CSMT' };
+  if (display.includes('bengaluru') || display.includes('bangalore')) return { name: 'KSR Bengaluru City Junction', area: 'Bengaluru', code: 'SBC' };
+  if (display.includes('delhi')) return { name: 'New Delhi Railway Station', area: 'Delhi', code: 'NDLS' };
+  if (display.includes('chennai')) return { name: 'MGR Chennai Central', area: 'Chennai', code: 'MAS' };
+  if (display.includes('kolkata')) return { name: 'Howrah Junction', area: 'Kolkata', code: 'HWH' };
+  return { name: `${place.name} Railway Station`, area: place.name };
 }
 
 function buildFlightBusLegs(origin: Place, destination: Place, airMinutes: number, flightFrom: number, flightTo: number): ItineraryLeg[] {
@@ -229,6 +256,56 @@ function buildBusViaLegs(origin: Place, destination: Place, totalMinutes: number
       frequency: 'Frequent',
       priceFrom: secondPrice,
       priceTo: Math.max(secondPrice, Math.round(priceTo * 0.45)),
+    },
+  ];
+}
+
+function buildTrainLegs(origin: Place, destination: Place, railMinutes: number, priceFrom: number, priceTo: number): ItineraryLeg[] {
+  const originStation = railwayStationFor(origin);
+  const destinationStation = railwayStationFor(destination);
+  const cityAccessMinutes = Math.min(45, Math.max(18, Math.round(railMinutes * 0.08)));
+  const finalAccessMinutes = Math.min(40, Math.max(15, Math.round(railMinutes * 0.06)));
+  const mainTrainMinutes = Math.max(60, railMinutes - cityAccessMinutes - finalAccessMinutes);
+
+  return [
+    {
+      mode: 'bus',
+      fromName: origin.name,
+      fromArea: origin.country,
+      toName: originStation.name,
+      toArea: originStation.area,
+      duration: formatDuration(cityAccessMinutes),
+      durationMinutes: cityAccessMinutes,
+      operator: 'Local bus / metro',
+      frequency: 'Frequent',
+      priceFrom: 30,
+      priceTo: 120,
+    },
+    {
+      mode: 'train',
+      fromName: `${originStation.name}${originStation.code ? ` (${originStation.code})` : ''}`,
+      fromArea: originStation.area,
+      toName: `${destinationStation.name}${destinationStation.code ? ` (${destinationStation.code})` : ''}`,
+      toArea: destinationStation.area,
+      duration: formatDuration(mainTrainMinutes),
+      durationMinutes: mainTrainMinutes,
+      operator: 'Indian Railways',
+      frequency: 'Check IRCTC schedules',
+      priceFrom,
+      priceTo,
+    },
+    {
+      mode: 'bus',
+      fromName: destinationStation.name,
+      fromArea: destinationStation.area,
+      toName: destination.name,
+      toArea: destination.country,
+      duration: formatDuration(finalAccessMinutes),
+      durationMinutes: finalAccessMinutes,
+      operator: 'Local bus / cab',
+      frequency: 'Frequent',
+      priceFrom: 40,
+      priceTo: 180,
     },
   ];
 }
@@ -482,6 +559,30 @@ function addBusLegs(route: RouteOption, origin: Place, destination: Place): Rout
   };
 }
 
+function addTrainLegs(route: RouteOption, origin: Place, destination: Place): RouteOption {
+  const legs = buildTrainLegs(origin, destination, route.durationMinutes, route.priceFrom, route.priceTo);
+  const [priceFrom, priceTo] = sumLegPrices(legs);
+  const durationMinutes = addMinutes(...legs.map(leg => leg.durationMinutes));
+
+  return {
+    ...route,
+    title: `Train to ${railwayStationFor(destination).name}, local transfer`,
+    duration: formatDuration(durationMinutes),
+    durationMinutes,
+    priceFrom,
+    priceTo,
+    legs,
+    stops: Math.max(route.stops, 2),
+    operators: ['Local transfer', 'Indian Railways', 'Local bus / cab'],
+    frequency: 'Rail plus station transfers',
+    highlights: ['Mixed train plan', 'Station transfers included', ...route.highlights.filter(item => item !== 'City center to city center')],
+    fareNotes: [
+      'This train plan includes station access and final local transfer estimates.',
+      'Use IRCTC and booking links below to confirm train availability and final fare.',
+    ],
+  };
+}
+
 function applyDateToRange(priceFrom: number, priceTo: number, mode: TransportMode, travelDate?: string): [number, number] {
   const factor = dateFareFactor(mode, travelDate);
   return [Math.round(priceFrom * factor), Math.round(priceTo * factor)];
@@ -556,7 +657,8 @@ function buildLiveOptions(route: OsrmRoute, origin: Place, destination: Place, t
   }
 
   if (roadDistanceKm > 180 && roadDistanceKm < 1800) {
-    routes.push(createRoute('train', roadDistanceKm, Math.round(driveMinutes * 0.72), routes.length, origin, destination, travelDate, roadPath, ['City center to city center']));
+    const trainRoute = createRoute('train', roadDistanceKm, Math.round(driveMinutes * 0.72), routes.length, origin, destination, travelDate, roadPath, ['City center to city center']);
+    routes.push(addTrainLegs(trainRoute, origin, destination));
   }
 
   if (roadDistanceKm > 450) {
@@ -586,6 +688,8 @@ export async function findRoutes(from: string, to: string, travelDate?: string):
     return routeOptions;
   } catch (error) {
     console.warn('Live route lookup failed. Falling back to estimated routes.', error);
+    const fallbackOrigin = placeFromQuery(from);
+    const fallbackDestination = placeFromQuery(to);
     const fallbackRoutes: RouteOption[] = generateRoutes(from, to).map(route => ({
       ...route,
       source: 'estimated' as const,
@@ -597,6 +701,10 @@ export async function findRoutes(from: string, to: string, travelDate?: string):
         'Use the booking links below to compare live prices before payment.',
       ],
     }));
-    return fallbackRoutes;
+    return fallbackRoutes.map(route => {
+      if (route.mode === 'train') return addTrainLegs(route, fallbackOrigin, fallbackDestination);
+      if (route.mode === 'bus') return addBusLegs(route, fallbackOrigin, fallbackDestination);
+      return route;
+    });
   }
 }

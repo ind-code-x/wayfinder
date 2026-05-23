@@ -1,0 +1,33 @@
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1080" height="1920" fill="#FFFAF2"/>
+  <rect width="1080" height="280" fill="#FF671F"/>
+  <rect y="1640" width="1080" height="280" fill="#138808"/>
+  <circle cx="950" cy="240" r="260" fill="white" fill-opacity="0.18"/>
+  <circle cx="110" cy="1648" r="290" fill="white" fill-opacity="0.15"/>
+  <g transform="translate(86 86)">
+    <circle cx="40" cy="40" r="33" stroke="white" stroke-width="8"/>
+    <path d="M52 21L29 61L62 47L52 21Z" fill="white"/>
+    <text x="90" y="54" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="52" font-weight="950" fill="white">wayfinder</text>
+  </g>
+  <text x="84" y="470" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="88" font-weight="950" fill="#071124">India travel</text>
+  <text x="84" y="572" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="88" font-weight="950" fill="#071124">made simple</text>
+  <text x="88" y="674" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="42" font-weight="600" fill="#475569">Search routes, compare modes,</text>
+  <text x="88" y="730" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="42" font-weight="600" fill="#475569">open booking links, and go.</text>
+  <rect x="84" y="820" width="912" height="560" rx="52" fill="white" stroke="#E2E8F0" stroke-width="3"/>
+  <rect x="132" y="888" width="816" height="104" rx="32" fill="#F8FAFC"/>
+  <text x="178" y="954" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="35" font-weight="850" fill="#071124">Hyderabad, India</text>
+  <rect x="132" y="1026" width="816" height="104" rx="32" fill="#F8FAFC"/>
+  <text x="178" y="1092" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="35" font-weight="850" fill="#071124">Pune, India</text>
+  <path d="M200 1268C360 1108 642 1348 858 1138" stroke="#138808" stroke-width="14" stroke-linecap="round" stroke-dasharray="34 28"/>
+  <circle cx="200" cy="1268" r="24" fill="#FF671F" stroke="white" stroke-width="9"/>
+  <circle cx="858" cy="1138" r="24" fill="#138808" stroke="white" stroke-width="9"/>
+  <rect x="132" y="1286" width="230" height="58" rx="29" fill="#FFF1E8"/>
+  <text x="247" y="1324" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="900" fill="#FF671F">Flight</text>
+  <rect x="392" y="1286" width="230" height="58" rx="29" fill="#EAF7E8"/>
+  <text x="507" y="1324" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="900" fill="#138808">Train</text>
+  <rect x="652" y="1286" width="230" height="58" rx="29" fill="#FFF1E8"/>
+  <text x="767" y="1324" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="900" fill="#FF671F">Bus</text>
+  <rect x="118" y="1472" width="844" height="94" rx="47" fill="#FF671F"/>
+  <text x="540" y="1533" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="38" font-weight="950" fill="white">Plan your next trip</text>
+  <text x="540" y="1798" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="46" font-weight="950" fill="white">wayfinderinfo.com</text>
+</svg>

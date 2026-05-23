@@ -1,5 +1,5 @@
-import { Plane, Train, Bus, Car, Ship, Clock, Repeat, Users, ChevronRight, Radio, type LucideIcon } from 'lucide-react';
-import { RouteOption, TransportMode } from '../types';
+import { Plane, Train, Bus, Car, Ship, Clock, Repeat, Users, ChevronRight, Radio, Footprints, Shuffle, type LucideIcon } from 'lucide-react';
+import { ItineraryLegMode, RouteOption, TransportMode } from '../types';
 import { formatCurrency } from '../lib/currency';
 
 const MODE_CONFIG: Record<TransportMode, {
@@ -46,6 +46,24 @@ const MODE_CONFIG: Record<TransportMode, {
   },
 };
 
+const LEG_ICON: Record<ItineraryLegMode, { icon: LucideIcon; color: string; bgColor: string; borderColor: string }> = {
+  fly: { icon: Plane, color: 'text-sky-600', bgColor: 'bg-sky-50', borderColor: 'border-sky-200' },
+  train: { icon: Train, color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200' },
+  bus: { icon: Bus, color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200' },
+  drive: { icon: Car, color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200' },
+  ferry: { icon: Ship, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' },
+  walk: { icon: Footprints, color: 'text-gray-600', bgColor: 'bg-gray-50', borderColor: 'border-gray-200' },
+  transfer: { icon: Shuffle, color: 'text-gray-600', bgColor: 'bg-gray-50', borderColor: 'border-gray-200' },
+};
+
+function uniqueLegModes(route: RouteOption): ItineraryLegMode[] {
+  if (!route.legs?.length) return [route.mode];
+  return route.legs
+    .map(leg => leg.mode)
+    .filter((mode, index, modes) => modes.indexOf(mode) === index)
+    .slice(0, 4);
+}
+
 interface RouteCardProps {
   route: RouteOption;
   isBest?: boolean;
@@ -56,6 +74,7 @@ interface RouteCardProps {
 export default function RouteCard({ route, isBest, isSelected, onSelect }: RouteCardProps) {
   const config = MODE_CONFIG[route.mode];
   const Icon = config.icon;
+  const legModes = uniqueLegModes(route);
   const isDrive = route.mode === 'drive';
   const updatedAt = route.updatedAt
     ? new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(new Date(route.updatedAt))
@@ -73,9 +92,23 @@ export default function RouteCard({ route, isBest, isSelected, onSelect }: Route
         <div className="flex items-start justify-between gap-4">
           {/* Left: mode + operators */}
           <div className="flex items-start gap-3 min-w-0">
-            <div className={`w-12 h-12 rounded-xl ${config.bgColor} ${config.borderColor} border flex items-center justify-center shrink-0`}>
-              <Icon size={22} className={config.color} />
-            </div>
+            {route.legs?.length ? (
+              <div className="flex items-center gap-1.5 shrink-0 pt-1">
+                {legModes.map(mode => {
+                  const legConfig = LEG_ICON[mode];
+                  const LegIcon = legConfig.icon;
+                  return (
+                    <div key={mode} className={`w-8 h-8 rounded-lg ${legConfig.bgColor} ${legConfig.borderColor} border flex items-center justify-center`}>
+                      <LegIcon size={17} className={legConfig.color} />
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className={`w-12 h-12 rounded-xl ${config.bgColor} ${config.borderColor} border flex items-center justify-center shrink-0`}>
+                <Icon size={22} className={config.color} />
+              </div>
+            )}
             <div className="min-w-0">
               <div className={`text-sm font-bold ${config.color} uppercase tracking-wider`}>{config.label}</div>
               {route.title && (

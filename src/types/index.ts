@@ -1,4 +1,20 @@
 export type TransportMode = 'fly' | 'train' | 'bus' | 'drive' | 'ferry';
+export type ItineraryLegMode = TransportMode | 'walk' | 'transfer';
+
+export interface ItineraryLeg {
+  mode: ItineraryLegMode;
+  fromName: string;
+  fromArea?: string;
+  toName: string;
+  toArea?: string;
+  duration: string;
+  durationMinutes: number;
+  operator?: string;
+  frequency?: string;
+  distance?: string;
+  priceFrom?: number;
+  priceTo?: number;
+}
 
 export interface RouteOption {
   id: string;
@@ -14,6 +30,7 @@ export interface RouteOption {
   distance: string;
   frequency: string;
   highlights: string[];
+  legs?: ItineraryLeg[];
   source?: 'live' | 'estimated';
   updatedAt?: string;
   routePath?: [number, number][];

@@ -1,0 +1,27 @@
+<svg width="1200" height="628" viewBox="0 0 1200 628" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="628" fill="#F8FAFC"/>
+  <rect width="1200" height="96" fill="#FF671F"/>
+  <rect y="532" width="1200" height="96" fill="#138808"/>
+  <g transform="translate(62 26)">
+    <circle cx="24" cy="24" r="20" stroke="white" stroke-width="6"/>
+    <path d="M32 13L18 37L38 28L32 13Z" fill="white"/>
+    <text x="58" y="34" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="950" fill="white">wayfinder</text>
+  </g>
+  <text x="62" y="196" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="62" font-weight="950" fill="#071124">Find the best route</text>
+  <text x="62" y="270" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="62" font-weight="950" fill="#071124">across India</text>
+  <text x="66" y="340" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#475569">Flights, trains, buses, cab and self-drive options</text>
+  <text x="66" y="380" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#475569">with fare estimates and booking links.</text>
+  <rect x="66" y="430" width="285" height="68" rx="34" fill="#FF671F"/>
+  <text x="208" y="474" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="26" font-weight="950" fill="white">Start searching</text>
+  <g transform="translate(690 150)">
+    <rect width="420" height="330" rx="36" fill="white" stroke="#E2E8F0" stroke-width="3"/>
+    <path d="M68 242C128 156 238 190 342 76" stroke="#138808" stroke-width="12" stroke-linecap="round" stroke-dasharray="26 20"/>
+    <circle cx="68" cy="242" r="18" fill="#FF671F" stroke="white" stroke-width="8"/>
+    <circle cx="342" cy="76" r="18" fill="#138808" stroke="white" stroke-width="8"/>
+    <rect x="52" y="48" width="188" height="50" rx="25" fill="#EAF7E8"/>
+    <text x="146" y="82" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="21" font-weight="900" fill="#138808">Live map routes</text>
+    <rect x="52" y="256" width="278" height="50" rx="25" fill="#FFF1E8"/>
+    <text x="191" y="290" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="21" font-weight="900" fill="#FF671F">Compare live fares</text>
+  </g>
+  <text x="600" y="592" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="950" fill="white">wayfinderinfo.com</text>
+</svg>

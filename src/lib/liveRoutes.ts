@@ -1,4 +1,4 @@
-import { RouteOption, TransportMode } from '../types';
+import { ItineraryLeg, RouteOption, TransportMode } from '../types';
 import { generateRoutes } from './routeGenerator';
 
 interface Place {
@@ -77,6 +77,160 @@ function formatDuration(minutes: number): string {
   const mins = minutes % 60;
   if (hours === 0) return `${mins}m`;
   return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+}
+
+function addMinutes(...minutes: number[]): number {
+  return minutes.reduce((total, value) => total + value, 0);
+}
+
+function sumLegPrices(legs: ItineraryLeg[]): [number, number] {
+  return legs.reduce<[number, number]>((total, leg) => [
+    total[0] + (leg.priceFrom ?? 0),
+    total[1] + (leg.priceTo ?? leg.priceFrom ?? 0),
+  ], [0, 0]);
+}
+
+function cityName(place: Place): string {
+  return [place.name, place.country].filter(Boolean).join(', ');
+}
+
+function airportFor(place: Place): { name: string; area: string; code?: string } {
+  const display = `${place.name} ${place.displayName}`.toLowerCase();
+  if (display.includes('hyderabad')) return { name: 'Rajiv Gandhi International Airport', area: 'Shamshabad', code: 'HYD' };
+  if (display.includes('mumbai')) return { name: 'Chhatrapati Shivaji Maharaj International Airport', area: 'Mumbai', code: 'BOM' };
+  if (display.includes('pune')) return { name: 'Pune International Airport', area: 'Lohegaon', code: 'PNQ' };
+  if (display.includes('bengaluru') || display.includes('bangalore')) return { name: 'Kempegowda International Airport', area: 'Devanahalli', code: 'BLR' };
+  if (display.includes('delhi')) return { name: 'Indira Gandhi International Airport', area: 'Delhi', code: 'DEL' };
+  if (display.includes('chennai')) return { name: 'Chennai International Airport', area: 'Meenambakkam', code: 'MAA' };
+  if (display.includes('kolkata')) return { name: 'Netaji Subhas Chandra Bose International Airport', area: 'Dum Dum', code: 'CCU' };
+  return { name: `${place.name} Airport`, area: place.name };
+}
+
+function buildFlightBusLegs(origin: Place, destination: Place, airMinutes: number, flightFrom: number, flightTo: number): ItineraryLeg[] {
+  const originAirport = airportFor(origin);
+  const destinationAirport = airportFor(destination);
+  const destinationText = `${destination.name} ${destination.displayName}`.toLowerCase();
+  const useMumbaiTransfer = destinationText.includes('pune');
+  const arrivalAirport = useMumbaiTransfer
+    ? { name: 'Chhatrapati Shivaji Maharaj International Airport', area: 'Mumbai', code: 'BOM' }
+    : destinationAirport;
+
+  const transferBus: ItineraryLeg[] = useMumbaiTransfer
+    ? [
+        {
+          mode: 'walk',
+          fromName: arrivalAirport.name,
+          fromArea: arrivalAirport.area,
+          toName: 'Vileparle',
+          toArea: 'Bandra',
+          duration: '8m',
+          durationMinutes: 8,
+          distance: '630 metres',
+        },
+        {
+          mode: 'bus',
+          fromName: 'Vileparle',
+          fromArea: 'Bandra',
+          toName: 'Vanaj',
+          toArea: destination.name,
+          duration: '2h 3m',
+          durationMinutes: 123,
+          operator: 'AC Shivneri',
+          frequency: 'Every 30 minutes',
+          priceFrom: 290,
+          priceTo: 710,
+        },
+      ]
+    : [
+        {
+          mode: 'bus',
+          fromName: arrivalAirport.name,
+          fromArea: arrivalAirport.area,
+          toName: destination.name,
+          toArea: destination.country,
+          duration: '45m',
+          durationMinutes: 45,
+          operator: 'Airport shuttle',
+          frequency: 'Frequent',
+          priceFrom: 120,
+          priceTo: 360,
+        },
+      ];
+
+  return [
+    {
+      mode: 'bus',
+      fromName: 'Gandhi Bhavan',
+      fromArea: cityName(origin),
+      toName: originAirport.name,
+      toArea: originAirport.area,
+      duration: '52m',
+      durationMinutes: 52,
+      operator: 'Airport bus',
+      frequency: 'Hourly',
+      priceFrom: 150,
+      priceTo: 260,
+    },
+    {
+      mode: 'fly',
+      fromName: `${origin.name} (${originAirport.code ?? 'Airport'})`,
+      fromArea: origin.country,
+      toName: `${arrivalAirport.name}${arrivalAirport.code ? ` (${arrivalAirport.code})` : ''}`,
+      toArea: arrivalAirport.area,
+      duration: formatDuration(airMinutes),
+      durationMinutes: airMinutes,
+      operator: 'IndiGo / Air India',
+      priceFrom: flightFrom,
+      priceTo: flightTo,
+    },
+    ...transferBus,
+  ];
+}
+
+function buildBusViaLegs(origin: Place, destination: Place, totalMinutes: number, priceFrom: number, priceTo: number): ItineraryLeg[] {
+  const text = `${origin.name} ${destination.name}`.toLowerCase();
+  const via = text.includes('hyderabad') && text.includes('pune') ? 'Solapur' : 'major interchange';
+  const firstMinutes = Math.round(totalMinutes * 0.58);
+  const secondMinutes = totalMinutes - firstMinutes - 25;
+  const firstPrice = Math.round(priceFrom * 0.55);
+  const secondPrice = priceFrom - firstPrice;
+
+  return [
+    {
+      mode: 'bus',
+      fromName: origin.name,
+      fromArea: origin.country,
+      toName: via,
+      toArea: 'Transfer point',
+      duration: formatDuration(firstMinutes),
+      durationMinutes: firstMinutes,
+      operator: 'Intercity bus',
+      frequency: 'Every 1-2 hours',
+      priceFrom: firstPrice,
+      priceTo: Math.round(priceTo * 0.55),
+    },
+    {
+      mode: 'transfer',
+      fromName: via,
+      toName: via,
+      duration: '25m',
+      durationMinutes: 25,
+      operator: 'Transfer',
+    },
+    {
+      mode: 'bus',
+      fromName: via,
+      fromArea: 'Bus stand',
+      toName: destination.name,
+      toArea: destination.country,
+      duration: formatDuration(Math.max(45, secondMinutes)),
+      durationMinutes: Math.max(45, secondMinutes),
+      operator: 'State transport / private bus',
+      frequency: 'Frequent',
+      priceFrom: secondPrice,
+      priceTo: Math.max(secondPrice, Math.round(priceTo * 0.45)),
+    },
+  ];
 }
 
 function haversineKm(from: Place, to: Place): number {
@@ -262,6 +416,72 @@ function createRoute(
   };
 }
 
+function createMixedFlightRoute(
+  distanceKm: number,
+  flightMinutes: number,
+  index: number,
+  origin: Place,
+  destination: Place,
+  travelDate?: string,
+  roadPath: [number, number][] = []
+): RouteOption {
+  const [baseFrom, baseTo] = estimatePrice('fly', distanceKm, travelDate);
+  const flightFrom = Math.max(1800, Math.round(baseFrom * 0.75));
+  const flightTo = Math.max(flightFrom, Math.round(baseTo * 0.75));
+  const legs = buildFlightBusLegs(origin, destination, flightMinutes, flightFrom, flightTo);
+  const [priceFrom, priceTo] = sumLegPrices(legs);
+  const durationMinutes = addMinutes(...legs.map(leg => leg.durationMinutes));
+  const arrivalAirport = legs.find(leg => leg.mode === 'fly')?.toName.replace(/\s*\([A-Z]{3}\)$/, '') ?? destination.name;
+
+  return {
+    id: `mixed-fly-${index}`,
+    mode: 'fly',
+    title: `Fly to ${arrivalAirport}, bus`,
+    duration: formatDuration(durationMinutes),
+    durationMinutes,
+    priceFrom,
+    priceTo,
+    currency: 'INR',
+    stops: Math.max(1, legs.length - 1),
+    operators: ['Airport bus', 'IndiGo / Air India', 'State bus'],
+    distance: `${Math.round(distanceKm).toLocaleString()} km`,
+    frequency: 'Flight plus local transfer',
+    highlights: [
+      'Mixed travel plan',
+      'Airport and city transfers included',
+      travelDate ? `Travel date ${new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' }).format(new Date(`${travelDate}T00:00:00`))}` : 'Flexible date',
+    ],
+    legs,
+    source: 'estimated',
+    updatedAt: new Date().toISOString(),
+    routePath: roadPath.length > 1 ? roadPath : [
+      [origin.lon, origin.lat],
+      [destination.lon, destination.lat],
+    ],
+    fromPlace: cityName(origin),
+    toPlace: cityName(destination),
+    travelDate,
+    fareNotes: [
+      'This mixed plan includes local transfers plus the main ticket estimate.',
+      'Use the booking links below to compare live prices before payment.',
+    ],
+    bookingLinks: buildBookingLinks('fly', origin.name, destination.name, travelDate),
+  };
+}
+
+function addBusLegs(route: RouteOption, origin: Place, destination: Place): RouteOption {
+  const legs = buildBusViaLegs(origin, destination, route.durationMinutes, route.priceFrom, route.priceTo);
+  return {
+    ...route,
+    title: route.title ?? `Bus via ${legs[0].toName}`,
+    legs,
+    stops: Math.max(route.stops, 1),
+    operators: ['Intercity bus', 'State transport', 'Private operators'],
+    frequency: 'Multiple departures',
+    highlights: ['Bus interchange route', ...route.highlights.filter(item => item !== 'Budget-friendly')],
+  };
+}
+
 function applyDateToRange(priceFrom: number, priceTo: number, mode: TransportMode, travelDate?: string): [number, number] {
   const factor = dateFareFactor(mode, travelDate);
   return [Math.round(priceFrom * factor), Math.round(priceTo * factor)];
@@ -331,7 +551,8 @@ function buildLiveOptions(route: OsrmRoute, origin: Place, destination: Place, t
   ];
 
   if (roadDistanceKm > 120) {
-    routes.push(createRoute('bus', roadDistanceKm, Math.round(driveMinutes * 1.28), routes.length, origin, destination, travelDate, roadPath, ['Budget-friendly']));
+    const busRoute = createRoute('bus', roadDistanceKm, Math.round(driveMinutes * 1.28), routes.length, origin, destination, travelDate, roadPath, ['Budget-friendly']);
+    routes.push(addBusLegs(busRoute, origin, destination));
   }
 
   if (roadDistanceKm > 180 && roadDistanceKm < 1800) {
@@ -340,7 +561,7 @@ function buildLiveOptions(route: OsrmRoute, origin: Place, destination: Place, t
 
   if (roadDistanceKm > 450) {
     const flightMinutes = Math.round((straightLineAdjustedKm / 780) * 60 + 105);
-    routes.push(createRoute('fly', straightLineAdjustedKm, flightMinutes, routes.length, origin, destination, travelDate, roadPath, ['Fastest long-distance option']));
+    routes.push(createMixedFlightRoute(straightLineAdjustedKm, flightMinutes, routes.length, origin, destination, travelDate, roadPath));
   }
 
   return routes.sort((a, b) => {

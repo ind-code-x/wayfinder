@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wayfinder Instagram Promo Export</title>
+  <style>
+    :root {
+      --green: #138808;
+      --orange: #ff671f;
+      --navy: #071124;
+      --muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #eef2f7;
+      color: var(--navy);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 24px;
+    }
+
+    .wrap {
+      width: min(440px, calc(100vw - 24px));
+      display: grid;
+      gap: 14px;
+    }
+
+    canvas {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      background: white;
+      border-radius: 22px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
+    }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+      border-radius: 16px;
+      background: white;
+      padding: 14px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      background: var(--orange);
+      color: white;
+      font-weight: 850;
+      padding: 13px 18px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <canvas id="promo" width="1080" height="1920"></canvas>
+    <div class="controls">
+      <p id="status">Exports a 9:16 Instagram Reel/Story video. MP4 is used when your browser supports it.</p>
+      <button id="export">Export 9:16 Instagram Video</button>
+    </div>
+  </main>
+
+  <script>
+    const canvas = document.getElementById('promo');
+    const ctx = canvas.getContext('2d');
+    const statusText = document.getElementById('status');
+    const exportButton = document.getElementById('export');
+    const W = canvas.width;
+    const H = canvas.height;
+    const DURATION = 15;
+
+    const scenes = [
+      { start: 0, end: 3.4, title: 'Plan India trips faster', body: 'Compare flights, trains, buses and drives in one simple search.', tag: 'wayfinder' },
+      { start: 3.4, end: 6.8, title: 'Routes on the map', body: 'See distance, travel time and route options before you decide.', tag: 'Search smarter' },
+      { start: 6.8, end: 10.2, title: 'Compare live fares', body: 'Open trusted booking sites and confirm the latest price instantly.', tag: 'Flights • Bus • Train' },
+      { start: 10.2, end: 13, title: 'Explore India daily', body: 'Temples, hill stations, cities, beaches and travel ideas.', tag: 'Discover more' },
+      { start: 13, end: 15, title: 'wayfinderinfo.com', body: 'Your India travel planning companion.', tag: 'Try it today' },
+    ];
+
+    function ease(x) {
+      return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function roundedRect(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function text(value, x, y, size, color, weight = 800, align = 'left') {
+      ctx.font = `${weight} ${size}px Inter, Segoe UI, Arial, sans-serif`;
+      ctx.fillStyle = color;
+      ctx.textAlign = align;
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(value, x, y);
+    }
+
+    function wrap(value, x, y, width, lineHeight, size, color, weight = 560) {
+      ctx.font = `${weight} ${size}px Inter, Segoe UI, Arial, sans-serif`;
+      ctx.fillStyle = color;
+      ctx.textAlign = 'left';
+      const words = value.split(' ');
+      let line = '';
+      let lineY = y;
+      for (const word of words) {
+        const next = line ? `${line} ${word}` : word;
+        if (ctx.measureText(next).width > width && line) {
+          ctx.fillText(line, x, lineY);
+          line = word;
+          lineY += lineHeight;
+        } else {
+          line = next;
+        }
+      }
+      ctx.fillText(line, x, lineY);
+    }
+
+    function background(time) {
+      const gradient = ctx.createLinearGradient(0, 0, W, H);
+      gradient.addColorStop(0, '#fff7ed');
+      gradient.addColorStop(0.5, '#ffffff');
+      gradient.addColorStop(1, '#ecfdf5');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.strokeStyle = 'rgba(15, 23, 42, 0.055)';
+      ctx.lineWidth = 2;
+      for (let x = -40; x < W; x += 90) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, H);
+        ctx.stroke();
+      }
+      for (let y = -40; y < H; y += 90) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = 'rgba(255, 103, 31, 0.15)';
+      ctx.beginPath();
+      ctx.arc(115 + Math.sin(time) * 35, 180, 250, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(19, 136, 8, 0.12)';
+      ctx.beginPath();
+      ctx.arc(910 + Math.cos(time * 0.8) * 40, 1600, 310, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function logo() {
+      ctx.save();
+      ctx.translate(94, 115);
+      ctx.strokeStyle = '#138808';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.arc(0, 0, 28, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = '#ff671f';
+      ctx.beginPath();
+      ctx.moveTo(12, -15);
+      ctx.lineTo(-5, 10);
+      ctx.lineTo(17, 4);
+      ctx.closePath();
+      ctx.fill();
+      text('way', 48, 12, 38, '#138808', 900);
+      text('finder', 124, 12, 38, '#ff671f', 900);
+      ctx.restore();
+    }
+
+    function pill(label, x, y) {
+      roundedRect(x, y, 300, 56, 28);
+      ctx.fillStyle = 'rgba(19, 136, 8, 0.12)';
+      ctx.fill();
+      text(label, x + 150, y + 37, 22, '#138808', 850, 'center');
+    }
+
+    function searchPanel(local) {
+      const y = 890;
+      roundedRect(80, y, 920, 190, 40);
+      ctx.fillStyle = 'white';
+      ctx.shadowColor = 'rgba(15, 23, 42, 0.14)';
+      ctx.shadowBlur = 34;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = 'rgba(15, 23, 42, 0.08)';
+      ctx.stroke();
+
+      text('Hyderabad, India', 135, y + 72, 34, '#071124', 780);
+      text('Pune, India', 135, y + 142, 34, '#071124', 780);
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(115, y + 95);
+      ctx.lineTo(945, y + 95);
+      ctx.stroke();
+
+      roundedRect(760, y + 57, 190, 76, 24);
+      ctx.fillStyle = local > 0.5 ? '#138808' : '#ff671f';
+      ctx.fill();
+      text('Search', 855, y + 107, 30, 'white', 850, 'center');
+    }
+
+    function routeCard(progress) {
+      const x = 80;
+      const y = 1140;
+      roundedRect(x, y, 920, 520, 42);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.86)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(15, 23, 42, 0.08)';
+      ctx.stroke();
+
+      text('Best options', x + 60, y + 80, 36, '#071124', 900);
+      const rows = [
+        ['Flight', '2h 19m', 'from Rs 2,800', '#0284c7'],
+        ['Train', '4h 52m', 'from Rs 1,007', '#059669'],
+        ['Bus', '8h 38m', 'from Rs 787', '#d97706'],
+      ];
+      rows.forEach((row, index) => {
+        const yy = y + 118 + index * 105;
+        roundedRect(x + 48, yy, 824, 78, 24);
+        ctx.fillStyle = '#f8fafc';
+        ctx.fill();
+        ctx.fillStyle = row[3];
+        ctx.beginPath();
+        ctx.arc(x + 92, yy + 39, 16, 0, Math.PI * 2);
+        ctx.fill();
+        text(row[0], x + 128, yy + 49, 28, '#071124', 850);
+        text(row[1], x + 395, yy + 49, 24, '#475569', 750);
+        text(row[2], x + 600, yy + 49, 24, '#138808', 850);
+      });
+
+      const start = { x: x + 92, y: y + 450 };
+      const end = { x: x + 810, y: y + 382 };
+      const t = ease(progress);
+      ctx.strokeStyle = '#138808';
+      ctx.lineWidth = 8;
+      ctx.setLineDash([20, 18]);
+      ctx.beginPath();
+      ctx.moveTo(start.x, start.y);
+      ctx.quadraticCurveTo(520, y + 310, lerp(start.x, end.x, t), lerp(start.y, end.y, t));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      for (const point of [start, end]) {
+        ctx.fillStyle = point === start ? '#ff671f' : '#138808';
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 19, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 7;
+        ctx.stroke();
+      }
+    }
+
+    function frame(time) {
+      const scene = scenes.find(item => time >= item.start && time <= item.end) || scenes[scenes.length - 1];
+      const local = Math.min(1, Math.max(0, (time - scene.start) / (scene.end - scene.start)));
+      const intro = ease(Math.min(1, local * 2.2));
+      background(time);
+      logo();
+      pill(scene.tag, 80, 205);
+
+      ctx.save();
+      ctx.globalAlpha = intro;
+      ctx.translate(0, (1 - intro) * 50);
+      wrap(scene.title, 80, 470, 900, 92, scene.title.length > 18 ? 62 : 76, '#071124', 950);
+      wrap(scene.body, 86, 655, 870, 52, 40, '#475569', 560);
+      searchPanel(local);
+      ctx.restore();
+
+      routeCard((time % 5.8) / 5.8);
+
+      text('wayfinderinfo.com', W / 2, 1818, 36, '#071124', 900, 'center');
+      ctx.fillStyle = '#ff671f';
+      ctx.fillRect(0, H - 26, W * (time / DURATION), 26);
+      ctx.fillStyle = '#138808';
+      ctx.fillRect(0, H - 13, W * (time / DURATION), 13);
+    }
+
+    let previewStart = performance.now();
+    function preview() {
+      frame(((performance.now() - previewStart) / 1000) % DURATION);
+      requestAnimationFrame(preview);
+    }
+    preview();
+
+    function supportedMime() {
+      if (typeof MediaRecorder === 'undefined') return null;
+      const candidates = [
+        { mime: 'video/mp4;codecs=avc1.42E01E', ext: 'mp4' },
+        { mime: 'video/mp4', ext: 'mp4' },
+        { mime: 'video/webm;codecs=vp9', ext: 'webm' },
+        { mime: 'video/webm;codecs=vp8', ext: 'webm' },
+        { mime: 'video/webm', ext: 'webm' },
+      ];
+      return candidates.find(item => MediaRecorder.isTypeSupported(item.mime)) || null;
+    }
+
+    async function exportVideo() {
+      const format = supportedMime();
+      if (!format) {
+        statusText.textContent = 'This browser cannot record video from canvas. Try latest Chrome or Edge.';
+        return;
+      }
+
+      exportButton.disabled = true;
+      exportButton.textContent = 'Exporting...';
+      statusText.textContent = `Recording 15 seconds as ${format.ext.toUpperCase()}. Keep this tab open.`;
+
+      const stream = canvas.captureStream(30);
+      const recorder = new MediaRecorder(stream, { mimeType: format.mime });
+      const chunks = [];
+
+      recorder.ondataavailable = event => {
+        if (event.data.size > 0) chunks.push(event.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: format.mime });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `wayfinder-instagram-9x16.${format.ext}`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        exportButton.disabled = false;
+        exportButton.textContent = 'Export 9:16 Instagram Video';
+        statusText.textContent = `Export complete: wayfinder-instagram-9x16.${format.ext}`;
+      };
+
+      recorder.start();
+      const start = performance.now();
+      function renderExport() {
+        const elapsed = (performance.now() - start) / 1000;
+        frame(Math.min(elapsed, DURATION));
+        if (elapsed < DURATION) requestAnimationFrame(renderExport);
+        else recorder.stop();
+      }
+      renderExport();
+    }
+
+    const format = supportedMime();
+    if (format) {
+      statusText.textContent = `Ready for Instagram 9:16 export. This browser will save ${format.ext.toUpperCase()}.`;
+    }
+    exportButton.addEventListener('click', exportVideo);
+  </script>
+</body>
+</html>

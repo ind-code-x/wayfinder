@@ -1,5 +1,5 @@
-import { Bus, Car, Clock, ExternalLink, IndianRupee, MapPin, Plane, Train, type LucideIcon } from 'lucide-react';
-import { RouteOption, TransportMode } from '../types';
+import { Bus, Car, Clock, ExternalLink, Footprints, IndianRupee, MapPin, Plane, Shuffle, Train, type LucideIcon } from 'lucide-react';
+import { ItineraryLegMode, RouteOption, TransportMode } from '../types';
 import { formatCurrency } from '../lib/currency';
 
 const MODE_STYLE: Record<TransportMode, { color: string; stroke: string; icon: LucideIcon; name: string }> = {
@@ -8,6 +8,16 @@ const MODE_STYLE: Record<TransportMode, { color: string; stroke: string; icon: L
   bus: { color: 'text-amber-700', stroke: '#d97706', icon: Bus, name: 'Bus' },
   drive: { color: 'text-orange-700', stroke: '#ea580c', icon: Car, name: 'Drive' },
   ferry: { color: 'text-blue-700', stroke: '#2563eb', icon: MapPin, name: 'Ferry' },
+};
+
+const LEG_STYLE: Record<ItineraryLegMode, { color: string; bg: string; bar: string; icon: LucideIcon; name: string }> = {
+  fly: { color: 'text-sky-700', bg: 'bg-sky-50', bar: 'bg-teal-500', icon: Plane, name: 'Plane' },
+  train: { color: 'text-emerald-700', bg: 'bg-emerald-50', bar: 'bg-emerald-600', icon: Train, name: 'Train' },
+  bus: { color: 'text-orange-700', bg: 'bg-orange-50', bar: 'bg-orange-500', icon: Bus, name: 'Bus' },
+  drive: { color: 'text-orange-700', bg: 'bg-orange-50', bar: 'bg-orange-500', icon: Car, name: 'Drive' },
+  ferry: { color: 'text-blue-700', bg: 'bg-blue-50', bar: 'bg-blue-600', icon: MapPin, name: 'Ferry' },
+  walk: { color: 'text-gray-600', bg: 'bg-gray-50', bar: 'bg-gray-300', icon: Footprints, name: 'Walk' },
+  transfer: { color: 'text-gray-600', bg: 'bg-gray-50', bar: 'bg-gray-300', icon: Shuffle, name: 'Transfer' },
 };
 
 interface RouteMapProps {
@@ -115,7 +125,7 @@ export default function RouteMap({ route, from, to }: RouteMapProps) {
             <Icon size={22} className={style.color} />
           </div>
           <div>
-            <h2 className="font-bold text-gray-900">{style.name} details</h2>
+            <h2 className="font-bold text-gray-900">{route.legs?.length ? route.title ?? `${style.name} details` : `${style.name} details`}</h2>
             <p className="text-sm text-gray-500">{route.fromPlace ?? from} to {route.toPlace ?? to}</p>
           </div>
         </div>
@@ -140,19 +150,87 @@ export default function RouteMap({ route, from, to }: RouteMapProps) {
           </div>
         </div>
 
-        <div className="mt-5">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Route steps</h3>
-          <div className="space-y-3">
-            {steps.map((step, index) => (
-              <div key={step} className="flex gap-3">
-                <div className="w-6 h-6 rounded-full bg-orange-50 text-green-800 text-xs font-bold flex items-center justify-center shrink-0">
-                  {index + 1}
-                </div>
-                <p className="text-sm text-gray-600">{step}</p>
-              </div>
-            ))}
+        {route.legs?.length ? (
+          <div className="mt-5">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Detailed travel plan</h3>
+            <div className="space-y-3">
+              {route.legs.map((leg, index) => {
+                const legStyle = LEG_STYLE[leg.mode];
+                const LegIcon = legStyle.icon;
+                const isConnector = leg.mode === 'walk' || leg.mode === 'transfer';
+
+                return (
+                  <div key={`${leg.mode}-${leg.fromName}-${leg.toName}-${index}`} className={isConnector ? 'rounded-xl bg-gray-50 border border-gray-100 p-3' : 'rounded-xl bg-white border border-gray-100 p-3 shadow-sm'}>
+                    <div className="flex gap-3">
+                      <div className="flex flex-col items-center shrink-0">
+                        <div className={`w-9 h-9 rounded-full ${legStyle.bg} ${legStyle.color} border border-white shadow-sm flex items-center justify-center`}>
+                          <LegIcon size={18} />
+                        </div>
+                        {!isConnector && <div className={`w-1 flex-1 min-h-20 rounded-full mt-1 ${legStyle.bar}`} />}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div>
+                          <div className="font-bold text-sm text-gray-900">{leg.fromName}</div>
+                          {leg.fromArea && <div className="text-xs text-gray-500">{leg.fromArea}</div>}
+                        </div>
+
+                        <div className="my-4 text-sm text-gray-700">
+                          <span>{leg.duration}</span>
+                          <span className="mx-1 text-gray-300">•</span>
+                          <span>{legStyle.name}</span>
+                          {leg.distance && (
+                            <>
+                              <span className="mx-1 text-gray-300">•</span>
+                              <span>{leg.distance}</span>
+                            </>
+                          )}
+                          {leg.frequency && (
+                            <>
+                              <span className="mx-1 text-gray-300">•</span>
+                              <span>{leg.frequency}</span>
+                            </>
+                          )}
+                        </div>
+
+                        {leg.operator && (
+                          <span className={`inline-flex rounded-md px-2 py-1 text-xs font-bold ${leg.mode === 'fly' ? 'bg-teal-500 text-white' : leg.mode === 'bus' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}`}>
+                            {leg.operator}
+                          </span>
+                        )}
+
+                        {(leg.priceFrom || leg.priceTo) && (
+                          <div className="mt-2 text-sm font-semibold text-gray-900">
+                            {formatCurrency(leg.priceFrom ?? 0, route.currency)}
+                            {leg.priceTo && leg.priceTo > (leg.priceFrom ?? 0) ? `-${formatCurrency(leg.priceTo, route.currency)}` : ''}
+                          </div>
+                        )}
+
+                        <div className="mt-4">
+                          <div className="font-bold text-sm text-gray-900">{leg.toName}</div>
+                          {leg.toArea && <div className="text-xs text-gray-500">{leg.toArea}</div>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mt-5">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Route steps</h3>
+            <div className="space-y-3">
+              {steps.map((step, index) => (
+                <div key={step} className="flex gap-3">
+                  <div className="w-6 h-6 rounded-full bg-orange-50 text-green-800 text-xs font-bold flex items-center justify-center shrink-0">
+                    {index + 1}
+                  </div>
+                  <p className="text-sm text-gray-600">{step}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {(route.fareBreakdown?.length || route.fareProviders?.length || route.bookingLinks?.length || route.fareNotes?.length) && (
           <div className="mt-5">

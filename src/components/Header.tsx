@@ -16,6 +16,7 @@ const NAV_ITEMS: { label: string; view: PageView }[] = [
   { label: 'Explore', view: 'explore' },
   { label: 'Blog', view: 'blog' },
   { label: 'About', view: 'about' },
+  { label: 'Advertise', view: 'advertise' },
 ];
 
 export default function Header({ transparent, onLogoClick, activeView = 'home', onNavigate, language, onLanguageChange }: HeaderProps) {
@@ -58,7 +59,7 @@ export default function Header({ transparent, onLogoClick, activeView = 'home', 
                   : `${textColor} hover:text-orange-400`
               }`}
             >
-              {item.view === 'explore' ? copy.explore : item.view === 'blog' ? copy.blog : copy.about}
+              {item.view === 'explore' ? copy.explore : item.view === 'blog' ? copy.blog : item.view === 'about' ? copy.about : item.label}
             </button>
           ))}
           <div className="relative">
@@ -112,7 +113,7 @@ export default function Header({ transparent, onLogoClick, activeView = 'home', 
               }}
               className={`text-left text-sm font-medium ${activeView === item.view ? 'text-green-700' : 'text-gray-700 hover:text-green-700'}`}
             >
-              {item.view === 'explore' ? copy.explore : item.view === 'blog' ? copy.blog : copy.about}
+              {item.view === 'explore' ? copy.explore : item.view === 'blog' ? copy.blog : item.view === 'about' ? copy.about : item.label}
             </button>
           ))}
           <div className="border-t border-gray-100 pt-3">

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { RouteOption, TransportMode } from '../types';
 import RouteCard from './RouteCard';
 import RouteMap from './RouteMap';
+import DestinationAds from './DestinationAds';
 import { getBestRoute } from '../lib/routeGenerator';
 import { formatCurrency } from '../lib/currency';
 
@@ -140,6 +141,8 @@ export default function RouteResults({ from, to, routes }: RouteResultsProps) {
           ))}
         </div>
       </div>
+
+      <DestinationAds destination={to} />
     </div>
   );
 }

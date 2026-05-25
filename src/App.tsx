@@ -9,6 +9,7 @@ import SearchBar from './components/SearchBar';
 import ExplorePage from './components/ExplorePage';
 import BlogPage from './components/BlogPage';
 import AboutPage from './components/AboutPage';
+import AdvertisePage from './components/AdvertisePage';
 import InfoPage from './components/InfoPage';
 import { SearchQuery, RouteOption, PageView, InfoPage as InfoPageType } from './types';
 import { findRoutes } from './lib/liveRoutes';
@@ -123,6 +124,7 @@ export default function App() {
           {view === 'explore' && <ExplorePage onSearch={handleSearch} />}
           {view === 'blog' && <BlogPage />}
           {view === 'about' && <AboutPage />}
+          {view === 'advertise' && <AdvertisePage />}
           {INFO_VIEWS.includes(view) && <InfoPage page={view as InfoPageType} />}
           <Footer onNavigate={handleNavigate} />
         </>

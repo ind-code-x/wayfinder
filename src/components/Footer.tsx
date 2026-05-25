@@ -21,6 +21,7 @@ const links: { section: string; items: { label: string; view: PageView }[] }[] =
     items: [
       { label: 'About us', view: 'about' },
       { label: 'Blog', view: 'blog' },
+      { label: 'Advertise', view: 'advertise' },
       { label: 'Careers', view: 'careers' },
       { label: 'Press', view: 'press' },
     ],

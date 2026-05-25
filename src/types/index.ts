@@ -69,6 +69,29 @@ export interface PopularRoute {
   search_count: number;
 }
 
+export type SponsoredAdType = 'hotel' | 'travel_agency';
+
+export interface SponsoredAd {
+  id: string;
+  business_type: SponsoredAdType;
+  business_name: string;
+  destination: string;
+  city: string;
+  description: string;
+  image_url: string;
+  map_url: string;
+  contact_phone: string;
+  contact_email?: string | null;
+  website_url?: string | null;
+  price_text?: string | null;
+  rating_text?: string | null;
+  distance_text?: string | null;
+  payment_reference: string;
+  status: 'active' | 'pending' | 'expired';
+  created_at: string;
+  updated_at: string;
+}
+
 export type InfoPage =
   | 'flights'
   | 'trains'
@@ -82,4 +105,4 @@ export type InfoPage =
   | 'privacy'
   | 'terms';
 
-export type PageView = 'home' | 'results' | 'explore' | 'blog' | 'about' | InfoPage;
+export type PageView = 'home' | 'results' | 'explore' | 'blog' | 'about' | 'advertise' | InfoPage;

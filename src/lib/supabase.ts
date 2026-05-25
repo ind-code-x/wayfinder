@@ -27,6 +27,45 @@ export type Database = {
           updated_at: string;
         };
       };
+      sponsored_ads: {
+        Row: {
+          id: string;
+          business_type: 'hotel' | 'travel_agency';
+          business_name: string;
+          destination: string;
+          city: string;
+          description: string;
+          image_url: string;
+          map_url: string;
+          contact_phone: string;
+          contact_email: string | null;
+          website_url: string | null;
+          price_text: string | null;
+          rating_text: string | null;
+          distance_text: string | null;
+          payment_reference: string;
+          status: 'active' | 'pending' | 'expired';
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          business_type: 'hotel' | 'travel_agency';
+          business_name: string;
+          destination: string;
+          city: string;
+          description: string;
+          image_url: string;
+          map_url: string;
+          contact_phone: string;
+          contact_email?: string | null;
+          website_url?: string | null;
+          price_text?: string | null;
+          rating_text?: string | null;
+          distance_text?: string | null;
+          payment_reference: string;
+          status?: 'active' | 'pending' | 'expired';
+        };
+      };
     };
   };
 };

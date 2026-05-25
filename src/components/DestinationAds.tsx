@@ -40,7 +40,7 @@ export default function DestinationAds({ destination }: DestinationAdsProps) {
   if (!loading && ads.length === 0) return null;
 
   return (
-    <section className="mt-10 border border-gray-100 rounded-2xl overflow-hidden bg-white">
+    <section className="border border-gray-100 rounded-2xl overflow-hidden bg-white">
       <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-gray-100">
         <div className="flex items-center gap-2">
           <Megaphone size={18} className="text-orange-600" />
@@ -57,8 +57,8 @@ export default function DestinationAds({ destination }: DestinationAdsProps) {
       {loading ? (
         <div className="p-5 text-sm text-gray-400">Loading promoted listings...</div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-gray-100">
-          <div className="max-h-[560px] overflow-y-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.95fr)_minmax(280px,1.05fr)] gap-0 divide-y lg:divide-y-0 lg:divide-x divide-gray-100">
+          <div className="max-h-[440px] overflow-y-auto">
             {ads.map(ad => {
               const TypeIcon = ad.business_type === 'hotel' ? Hotel : Users;
               return (
@@ -67,7 +67,7 @@ export default function DestinationAds({ destination }: DestinationAdsProps) {
                     <img
                       src={ad.image_url}
                       alt={ad.business_name}
-                      className="w-36 h-32 sm:w-44 sm:h-36 object-cover rounded-xl bg-gray-100 shrink-0"
+                      className="w-28 h-28 sm:w-36 sm:h-32 object-cover rounded-xl bg-gray-100 shrink-0"
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
@@ -128,11 +128,11 @@ export default function DestinationAds({ destination }: DestinationAdsProps) {
             })}
           </div>
 
-          <div className="min-h-[420px] bg-slate-50">
+          <div className="min-h-[360px] bg-slate-50">
             <iframe
               title={`${city} promoted listings map`}
               src={`https://maps.google.com/maps?q=${encodeURIComponent(`${city} hotels travel agency`)}&output=embed`}
-              className="h-full min-h-[420px] w-full border-0"
+              className="h-full min-h-[360px] w-full border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />

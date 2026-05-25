@@ -113,16 +113,19 @@ export default function RouteResults({ from, to, routes }: RouteResultsProps) {
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_420px] gap-6 items-start">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {sorted.map(route => (
-              <RouteCard
-                key={route.id}
-                route={route}
-                isBest={route.id === bestRoute?.id && activeMode === 'all' && sortBy === 'recommended'}
-                isSelected={route.id === selectedRoute?.id}
-                onSelect={route => setSelectedRouteId(route.id)}
-              />
-            ))}
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {sorted.map(route => (
+                <RouteCard
+                  key={route.id}
+                  route={route}
+                  isBest={route.id === bestRoute?.id && activeMode === 'all' && sortBy === 'recommended'}
+                  isSelected={route.id === selectedRoute?.id}
+                  onSelect={route => setSelectedRouteId(route.id)}
+                />
+              ))}
+            </div>
+            <DestinationAds destination={to} />
           </div>
           {selectedRoute && <RouteMap route={selectedRoute} from={from} to={to} />}
         </div>
@@ -141,8 +144,6 @@ export default function RouteResults({ from, to, routes }: RouteResultsProps) {
           ))}
         </div>
       </div>
-
-      <DestinationAds destination={to} />
     </div>
   );
 }

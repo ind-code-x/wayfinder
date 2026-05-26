@@ -44,6 +44,8 @@ export type Database = {
           rating_text: string | null;
           distance_text: string | null;
           payment_reference: string;
+          payment_amount_inr: number;
+          payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
           status: 'active' | 'pending' | 'expired';
           created_at: string;
           updated_at: string;
@@ -63,6 +65,8 @@ export type Database = {
           rating_text?: string | null;
           distance_text?: string | null;
           payment_reference: string;
+          payment_amount_inr?: number;
+          payment_status?: 'pending' | 'paid' | 'failed' | 'refunded';
           status?: 'active' | 'pending' | 'expired';
         };
       };

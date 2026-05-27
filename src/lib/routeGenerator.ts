@@ -34,16 +34,19 @@ const FREQUENCIES: Record<TransportMode, string[]> = {
 export function generateRoutes(from: string, to: string): RouteOption[] {
   const seed = hash(from.toLowerCase() + to.toLowerCase());
   const dist = seededRand(seed, 200, 9000);
+  const domesticIndia = from.toLowerCase().includes('india') && to.toLowerCase().includes('india');
   const isLongHaul = dist > 3000;
   const isMedium = dist > 800 && dist <= 3000;
 
-  const modes: TransportMode[] = isLongHaul
+  const modes: TransportMode[] = domesticIndia
+    ? ['fly', 'train', 'bus', 'drive']
+    : isLongHaul
     ? ['fly', 'bus']
     : isMedium
     ? ['fly', 'train', 'bus', 'drive']
     : ['drive', 'train', 'bus', 'fly'];
 
-  if (seededRand(seed + 99, 0, 1) === 1 && !isLongHaul) {
+  if (seededRand(seed + 99, 0, 1) === 1 && !isLongHaul && !domesticIndia) {
     modes.push('ferry');
   }
 

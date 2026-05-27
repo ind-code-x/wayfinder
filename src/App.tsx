@@ -10,6 +10,7 @@ import ExplorePage from './components/ExplorePage';
 import BlogPage from './components/BlogPage';
 import AboutPage from './components/AboutPage';
 import AdvertisePage from './components/AdvertisePage';
+import PaymentStatusPage from './components/PaymentStatusPage';
 import InfoPage from './components/InfoPage';
 import { SearchQuery, RouteOption, PageView, InfoPage as InfoPageType } from './types';
 import { findRoutes } from './lib/liveRoutes';
@@ -36,6 +37,13 @@ export default function App() {
   const [routes, setRoutes] = useState<RouteOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState<LanguageCode>('en');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const payment = params.get('payment');
+    if (payment === 'success') setView('payment-success');
+    if (payment === 'failed') setView('payment-failed');
+  }, []);
 
   const handleSearch = async (q: SearchQuery) => {
     setLoading(true);
@@ -125,6 +133,8 @@ export default function App() {
           {view === 'blog' && <BlogPage />}
           {view === 'about' && <AboutPage />}
           {view === 'advertise' && <AdvertisePage />}
+          {view === 'payment-success' && <PaymentStatusPage status="success" onNavigate={handleNavigate} />}
+          {view === 'payment-failed' && <PaymentStatusPage status="failed" onNavigate={handleNavigate} />}
           {INFO_VIEWS.includes(view) && <InfoPage page={view as InfoPageType} />}
           <Footer onNavigate={handleNavigate} />
         </>

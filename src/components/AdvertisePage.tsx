@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { SponsoredAdType } from '../types';
 
 const PROMOTION_AMOUNT_INR = 299;
+const SUBSCRIPTION_DAYS = 30;
 const PAYMENT_PAGE_URL = import.meta.env.VITE_RAZORPAY_PAYMENT_PAGE_URL as string | undefined;
 
 const INITIAL_FORM = {
@@ -49,7 +50,10 @@ export default function AdvertisePage() {
     setPaymentStarted(true);
     if (PAYMENT_PAGE_URL) {
       const url = new URL(PAYMENT_PAGE_URL);
+      const successUrl = new URL(window.location.href);
+      successUrl.search = '?payment=success';
       url.searchParams.set('amount', String(PROMOTION_AMOUNT_INR));
+      url.searchParams.set('redirect_url', successUrl.toString());
       if (form.contactEmail) url.searchParams.set('email', form.contactEmail);
       if (form.contactPhone) url.searchParams.set('phone', form.contactPhone);
       window.open(url.toString(), '_blank', 'noopener,noreferrer');
@@ -83,6 +87,9 @@ export default function AdvertisePage() {
     setLoading(true);
 
     try {
+      const subscriptionStart = new Date();
+      const subscriptionEnd = new Date(subscriptionStart);
+      subscriptionEnd.setDate(subscriptionEnd.getDate() + SUBSCRIPTION_DAYS);
       const extension = imageFile.name.split('.').pop() || 'jpg';
       const imagePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
       const { error: uploadError } = await supabase.storage
@@ -117,6 +124,9 @@ export default function AdvertisePage() {
           payment_reference: form.paymentReference.trim(),
           payment_amount_inr: PROMOTION_AMOUNT_INR,
           payment_status: 'paid',
+          subscription_plan: 'monthly',
+          subscription_starts_at: subscriptionStart.toISOString(),
+          subscription_expires_at: subscriptionEnd.toISOString(),
           status: 'active',
         });
 
@@ -125,7 +135,7 @@ export default function AdvertisePage() {
       setForm(INITIAL_FORM);
       setImageFile(null);
       setPaymentStarted(false);
-      setMessage({ type: 'success', text: 'Payment reference saved. Your promoted listing is now active for matching destination searches.' });
+      setMessage({ type: 'success', text: 'Payment reference saved. Your one-month promoted listing is now active for matching destination searches.' });
     } catch (error) {
       setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Could not submit listing. Please try again.' });
     } finally {
@@ -142,7 +152,7 @@ export default function AdvertisePage() {
           </div>
           <div>
             <p className="text-sm font-semibold uppercase tracking-wide text-green-700">ADIARU SOFT SOLUTIONS PRIVATE LIMITED</p>
-            <h1 className="text-2xl sm:text-3xl font-black text-gray-950">Promote your hotel or travel agency</h1>
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-950">Promote your hotel or travel agency for 1 month</h1>
           </div>
         </div>
 
@@ -232,6 +242,13 @@ export default function AdvertisePage() {
                 <PaymentRow label="Amount">
                   <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-3 font-bold text-gray-950">
                     ₹ {PROMOTION_AMOUNT_INR.toFixed(2)}
+                    <span className="ml-2 text-xs font-semibold text-gray-500">/ 1 month</span>
+                  </div>
+                </PaymentRow>
+
+                <PaymentRow label="Plan">
+                  <div className="rounded-lg border border-green-100 bg-green-50 px-3 py-3 text-sm font-bold text-green-700">
+                    Monthly promotion, expires automatically after {SUBSCRIPTION_DAYS} days
                   </div>
                 </PaymentRow>
 
@@ -276,6 +293,7 @@ export default function AdvertisePage() {
               {paymentStarted && (
                 <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-3 text-xs text-blue-700">
                   After payment, copy the Razorpay payment ID/reference here and submit your listing.
+                  The ad stops displaying automatically after one month, but the record stays in the database.
                 </div>
               )}
             </div>

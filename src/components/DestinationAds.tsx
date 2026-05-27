@@ -17,16 +17,21 @@ export default function DestinationAds({ destination }: DestinationAdsProps) {
   const city = useMemo(() => destinationCity(destination), [destination]);
 
   useEffect(() => {
-    if (!supabase || !city) return;
+    const client = supabase;
+    if (!client || !city) return;
 
     setLoading(true);
-    void supabase
+    void client
+      .rpc('expire_sponsored_ads')
+      .then(() => client
       .from('sponsored_ads')
       .select('*')
       .eq('status', 'active')
+      .eq('payment_status', 'paid')
+      .gt('subscription_expires_at', new Date().toISOString())
       .or(`city.ilike.%${city}%,destination.ilike.%${city}%`)
       .order('created_at', { ascending: false })
-      .limit(8)
+      .limit(8))
       .then(({ data, error }) => {
         if (!error && data) setAds(data as SponsoredAd[]);
         else setAds([]);

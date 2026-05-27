@@ -46,6 +46,9 @@ export type Database = {
           payment_reference: string;
           payment_amount_inr: number;
           payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+          subscription_plan: 'monthly' | 'yearly';
+          subscription_starts_at: string;
+          subscription_expires_at: string;
           status: 'active' | 'pending' | 'expired';
           created_at: string;
           updated_at: string;
@@ -67,6 +70,9 @@ export type Database = {
           payment_reference: string;
           payment_amount_inr?: number;
           payment_status?: 'pending' | 'paid' | 'failed' | 'refunded';
+          subscription_plan?: 'monthly' | 'yearly';
+          subscription_starts_at?: string;
+          subscription_expires_at?: string;
           status?: 'active' | 'pending' | 'expired';
         };
       };

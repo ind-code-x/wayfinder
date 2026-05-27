@@ -43,6 +43,7 @@ export default function RouteResults({ from, to, routes }: RouteResultsProps) {
     return a.durationMinutes - b.durationMinutes;
   });
   const selectedRoute = routes.find(route => route.id === selectedRouteId) ?? sorted[0] ?? routes[0];
+  const adsAfterIndex = sorted.length >= 4 ? 3 : Math.min(1, sorted.length - 1);
 
   useEffect(() => {
     setSelectedRouteId(routes[0]?.id ?? null);
@@ -123,7 +124,7 @@ export default function RouteResults({ from, to, routes }: RouteResultsProps) {
                     isSelected={route.id === selectedRoute?.id}
                     onSelect={route => setSelectedRouteId(route.id)}
                   />
-                  {index === Math.min(1, sorted.length - 1) && (
+                  {index === adsAfterIndex && (
                     <div className="md:col-span-2">
                       <DestinationAds destination={to} />
                     </div>
